@@ -16,7 +16,6 @@ COPY requirements.txt /requirements.txt
 USER airflow
 RUN pip install --no-cache-dir -r /requirements.txt
 
-# Copy project files
 
 RUN mkdir -p /opt/airflow/dags && chmod 775 /opt/airflow/dags
 USER airflow
