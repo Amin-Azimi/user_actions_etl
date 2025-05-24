@@ -1,5 +1,5 @@
 # Dockerfile
-FROM apache/airflow:2.7.2-python3.9
+FROM apache/airflow:3.0.1
 
 USER root
 
@@ -12,12 +12,11 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 COPY requirements.txt /requirements.txt
+
+USER airflow
 RUN pip install --no-cache-dir -r /requirements.txt
 
 # Copy project files
-COPY ./airflow /opt/airflow
-COPY ./scripts /opt/airflow/scripts
-COPY ./database /opt/airflow/database
-COPY ./raw_data /opt/airflow/raw_data
 
+RUN mkdir -p /opt/airflow/dags && chmod 775 /opt/airflow/dags
 USER airflow

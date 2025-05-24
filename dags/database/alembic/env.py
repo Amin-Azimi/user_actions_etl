@@ -5,8 +5,8 @@ import os
 import sys
 
 # Add parent directory to sys.path to import model.py from database folder
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from database.model import Base  # Import Base from model.py
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from model import Base 
 
 # Interpret the config file for Python logging
 config = context.config
