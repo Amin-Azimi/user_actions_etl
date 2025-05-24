@@ -1,4 +1,5 @@
 # User Actions ETL Pipeline
+  ![image](https://github.com/user-attachments/assets/38953231-e782-489c-9d13-a0e207b08200)
 
 ## Overview
 This project implements an ETL (Extract, Transform, Load) pipeline to process mobile app logs from `dags/raw_data/raw_logs.json`, transform them into a star schema, and load them into a PostgreSQL database (`user_actions`). The pipeline uses Apache Airflow for orchestration, Docker Compose for containerization, Alembic for database migrations, and SQLAlchemy for schema definition. ETL logic resides in `dags/` (`extract.py`, `transform.py`, `load.py`), with utilities in `dags/utils/` (`db.py`, `quality_checks.py`). The pipeline handles non-unique `user_id` values, performs pre-transform quality checks, and retrieves existing `action_key` values for `action_type` in subsequent runs to ensure data consistency.
@@ -159,4 +160,3 @@ The database stores:
 - `dim_locations`: Unique locations (`US`, `EU`).
 - `fact_user_actions`: All actions with `user_key`, `action_key`, `device_key`, `location_key`, etc.
 
-  ![image](https://github.com/user-attachments/assets/38953231-e782-489c-9d13-a0e207b08200)
