@@ -21,7 +21,7 @@ def load_data(ti=None):
         log.error("Task Instance (ti) not provided to load_data. Cannot retrieve data.")
         raise ValueError("Airflow Task Instance (ti) is required for XCom pull.")
 
-    cleaned_data = ti.xcom_pull(task_ids='transform', key='transformed_log_data')
+    cleaned_data = ti.xcom_pull(task_ids='transform')
 
     if not cleaned_data:
         log.warning("No cleaned data found from the 'transform' task. Skipping data load.")

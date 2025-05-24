@@ -23,7 +23,7 @@ default_args = {
 with DAG(
     dag_id='etl_pipeline_dag',
     default_args=default_args,
-    description='ETL pipeline for ingesting and processing JSON logs',
+    description='ETL pipeline for ingesting and processing JSON user logs',
     schedule='@daily',
     # ----------------------------------------
     start_date=datetime(2024, 1, 1),
@@ -38,7 +38,7 @@ with DAG(
         on_failure_callback=lambda context: log.error(f"Task {context['task_instance'].task_id} failed.", exc_info=True),
     )
     pre_transform_quality_check_task = PythonOperator(
-        task_id='pre_transform_quality_check',
+        task_id='pre_transform_check',
         python_callable=run_quality_checks,
         op_kwargs={
             'key_fields_for_duplicates': ['user_id', 'timestamp', 'action_type']
@@ -61,7 +61,7 @@ with DAG(
         on_failure_callback=lambda context: log.error(f"Task {context['task_instance'].task_id} failed.", exc_info=True),
     )
 
-    log.info("Setting up task dependencies: Extract -> Transform -> Load -> Quality Check.")
+    log.info("Setting up task dependencies: extract_task >> pre_transform_quality_check_task >> transform_task >> load_task")
     extract_task >> pre_transform_quality_check_task >> transform_task >> load_task
 
 log.info("ETL pipeline DAG definition complete.")

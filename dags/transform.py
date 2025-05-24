@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 
 from psycopg2 import IntegrityError
@@ -122,11 +121,10 @@ def transform_data(ti=None):
         log.error("Task Instance (ti) not provided to clean_logs. Cannot retrieve raw data.")
         raise ValueError("Airflow Task Instance (ti) is required for XCom pull.")
 
-    raw_logs = ti.xcom_pull(task_ids='pre_transform_quality_check')
+    raw_logs = ti.xcom_pull(task_ids='pre_transform_check')
 
     if not raw_logs:
         log.warning("No raw log data found from the 'extract' task. Transformation skipped.")
-        ti.xcom_push(key='transformed_log_data', value=[]) 
         return [] 
 
     log.info(f"Received {len(raw_logs)} raw log entries for transformation.")
@@ -203,7 +201,6 @@ def transform_data(ti=None):
             db_session.close() 
             log.info("Database session closed.")
 
-    ti.xcom_push(key='transformed_log_data', value=fact_records_for_load)
     log.info(f"Pushed {len(fact_records_for_load)} fact records to XComs with key 'transformed_log_data'.")
     
     return fact_records_for_load
