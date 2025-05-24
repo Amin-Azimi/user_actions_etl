@@ -158,3 +158,5 @@ The database stores:
 - `dim_devices`: Unique devices (`iPhone`, `Android`).
 - `dim_locations`: Unique locations (`US`, `EU`).
 - `fact_user_actions`: All actions with `user_key`, `action_key`, `device_key`, `location_key`, etc.
+
+  ![image](https://github.com/user-attachments/assets/38953231-e782-489c-9d13-a0e207b08200)
