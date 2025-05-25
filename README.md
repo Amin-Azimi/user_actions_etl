@@ -76,13 +76,27 @@ user_actions_etl/
 - `dags/raw_data/raw_logs.json` in the project directory.
 
 ### Steps
-1. **Generate Fernet Key**:
+1. **Clone repository**:
+   Clone the repository and navigate to the project directory:
+   ```bash
+      git clone https://github.com/Amin-Azimi/user_actions_etl
+      cd user_actions_etl
+   ```
+
+2. **Set up Environment Variables**:
+   Docker Compose requires a `.env` file to manage environment variables for services like PostgreSQL and Airflow.
+   ```bash
+   cp .env.example .env
+   ```
+   Now, open the newly created `.env` file in a text editor and fill in your actual values for database credentials and any other required variables. Do not commit this .env file to your Git repository.
+
+4. **Generate Fernet Key**:
    ```bash
    python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
    ```
    Replace `AIRFLOW__CORE__FERNET_KEY` in `docker-compose.yaml` with the generated key.
 
-2. **Run Docker Compose**:
+5. **Run Docker Compose**:
    ```bash
    docker-compose up -d
    ```
@@ -93,12 +107,12 @@ user_actions_etl/
    - Airflow webserver (port 8080).
    - Airflow scheduler.
 
-3. **Access Airflow**:
+6. **Access Airflow**:
    - Open `http://localhost:8080` in a browser.
    - Log in with username `admin`, password `admin`.
    - Enable and trigger the `etl_pipeline_dag` DAG manually.
 
-4. **Verify Output**:
+7. **Verify Output**:
    - Connect to the PostgreSQL output database:
      ```bash
      docker exec -it user_actions_etl_output_db_1 psql -U user -d user_actions
@@ -111,13 +125,13 @@ user_actions_etl/
      ```
    - Check Airflow task logs for validation results (e.g., nulls, duplicates, uniqueness).
 
-5. **Stop Services**:
+8. **Stop Services**:
    ```bash
    docker-compose down
    ```
 
 ## Data Quality Checks
-- **Pre-Transform** (`pre_transform_quality_check_task`):
+- **Pre-Transform** (`pre_transform_check`):
   - Checks for nulls in `user_id`, `action_type`, `timestamp` using `check_nulls`.
   - Checks for duplicates based on `user_id`, `timestamp`, `action_type` using `check_duplicates`.
   - Excludes invalid records, logs results.
@@ -137,12 +151,8 @@ user_actions_etl/
 
 ## Future Improvements
 - Add incremental data loading for large datasets.
-- Implement detailed logging for monitoring.
 - Add unit tests for ETL and utility modules.
 - Configure Airflow for scheduled runs.
-
-## Repository
-- GitHub: `github.com/amin-azimi/user_actions_etl`
 
 ## Example Data
 For `dags/raw_data/raw_logs.json`:
@@ -159,4 +169,3 @@ The database stores:
 - `dim_devices`: Unique devices (`iPhone`, `Android`).
 - `dim_locations`: Unique locations (`US`, `EU`).
 - `fact_user_actions`: All actions with `user_key`, `action_key`, `device_key`, `location_key`, etc.
-
