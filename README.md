@@ -2,7 +2,7 @@
   ![image](https://github.com/user-attachments/assets/38953231-e782-489c-9d13-a0e207b08200)
 
 ## Overview
-This project implements an ETL (Extract, Transform, Load) pipeline to process mobile app logs from `dags/raw_data/raw_logs.json`, transform them into a star schema, and load them into a PostgreSQL database (`user_actions`). The pipeline uses Apache Airflow for orchestration, Docker Compose for containerization, Alembic for database migrations, and SQLAlchemy for schema definition. ETL logic resides in `dags/` (`extract.py`, `transform.py`, `load.py`), with utilities in `dags/utils/` (`db.py`, `quality_checks.py`). The pipeline handles non-unique `user_id` values, performs pre-transform quality checks, and retrieves existing `action_key` values for `action_type` in subsequent runs to ensure data consistency.
+This project implements an ETL (Extract, Transform, Load) pipeline to process mobile app logs from `dags/raw_data/raw_logs.json`, transform them into a star schema, and load them into a PostgreSQL database . The pipeline uses Apache Airflow for orchestration, Docker Compose for containerization, Alembic for database migrations, and SQLAlchemy for schema definition. ETL logic resides in `dags/` (`extract.py`, `transform.py`, `load.py`), with utilities in `dags/utils/` (`db.py`, `quality_checks.py`). The pipeline handles non-unique `user_id` values, performs pre-transform quality checks.
 
 ## Star Schema
 The PostgreSQL database uses a star schema with five tables:
@@ -73,7 +73,6 @@ user_actions_etl/
 ## Setup Instructions
 ### Prerequisites
 - Docker and Docker Compose installed.
-- `dags/raw_data/raw_logs.json` in the project directory.
 
 ### Steps
 1. **Clone repository**:
@@ -88,7 +87,6 @@ user_actions_etl/
    ```bash
    cp .env.example .env
    ```
-   Now, open the newly created `.env` file in a text editor and fill in your actual values for database credentials and any other required variables. Do not commit this .env file to your Git repository.
 
 4. **Generate Fernet Key**:
    ```bash
@@ -101,22 +99,28 @@ user_actions_etl/
    docker-compose up -d
    ```
    This starts:
-   - PostgreSQL for Airflow metadata (`airflow_metadata`).
-   - PostgreSQL for output database (`user_actions`).
+   - All DB instances 
    - Airflow initializer (sets up database, admin user).
    - Airflow webserver (port 8080).
-   - Airflow scheduler.
+   - Other Airflow services.
+   - Execute migrations
 
 6. **Access Airflow**:
    - Open `http://localhost:8080` in a browser.
-   - Log in with username `admin`, password `admin`.
+   - Log in with username `airflow`, password `airflow`.
    - Enable and trigger the `etl_pipeline_dag` DAG manually.
 
 7. **Verify Output**:
-   - Connect to the PostgreSQL output database:
+   - Connect to the PostgreSQL database:
+  
      ```bash
-     docker exec -it user_actions_etl_output_db_1 psql -U user -d user_actions
-     \dt
+     DB_USER ="airflow"
+     DB_PASS= "airflow"
+     DB_NAME= "etl"
+     DB_HOST= "localhost"
+     DB_PORT= "5432"
+     ```
+     ```bash
      SELECT * FROM dim_users;
      SELECT * FROM dim_actions;
      SELECT * FROM dim_devices;
@@ -141,9 +145,8 @@ user_actions_etl/
   - Logs quality metrics in Airflow.
 
 ## Notes
-- **PostgreSQL**: The output database is PostgreSQL (`user_actions`). Airflow metadata uses a separate PostgreSQL instance (`airflow_metadata`).
+- **PostgreSQL**: The output database is PostgreSQL (`etl`). Airflow metadata uses a separate PostgreSQL instance (`airflow`).
 - **Task Sequence**: `extract_task >> pre_transform_quality_check_task >> transform_task >> load_task`.
-- **Subsequent Runs**: Queries `dim_actions`, `dim_devices`, and `dim_locations` via `dags/utils/db.py` to reuse existing keys, preventing foreign key errors.
 - **Cache Removal**: `__pycache__` directories are excluded via `.gitignore` and removed before running.
 - **init-db/**: Assumed to contain optional initialization scripts; update if critical.
 - **Performance**: Ensure 4GB+ RAM for Docker Compose.
