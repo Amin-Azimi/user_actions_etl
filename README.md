@@ -96,8 +96,10 @@ user_actions_etl/
 
 5. **Run Docker Compose**:
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
+   Note: If you have Docker Compose V2 installed (Docker Engine 20.10+), use docker compose (space), otherwise use the legacy docker-compose.
+   
    This starts:
    - All DB instances 
    - Airflow initializer (sets up database, admin user).
